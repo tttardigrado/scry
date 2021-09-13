@@ -1,12 +1,12 @@
+from sessions.scrysession import ScrySession
 from typing import Dict, List
 from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import NestedCompleter
 from functions.general import clear_screen
-from functions.widgets import style, prompt_txt
 import re
 
 
-class Game:
+class Game(ScrySession):
     """
     Game session for the SolRing app
 
@@ -14,12 +14,7 @@ class Game:
     """
 
     def __init__(self) -> None:
-        # create the dice session
-        self.session: PromptSession = self.game_session()
-
-        # determine the SolRing toolbar text
-        self.bottom_toolbar: str = " SolRing: Scryfall inside your terminal"
-
+        ScrySession.__init__(self)
         # values to store
         self.values: Dict[str, float] = {}
 
@@ -70,40 +65,7 @@ edit, e: execute calculations on a variable and change its value to the result
     -> edit var ^ x -> value of the variable to the power of x
     """
 
-    def not_valid(self) -> None:
-        """
-        Function that prints a message when a command is not valid
-        """
-        print("Not a valid command!")
-
-    def error(self) -> None:
-        """
-        Function that prints a message when a command an error occurs
-        """
-        print("That variable does not exist!")
-
-    def run(self) -> None:
-        """
-        Run the prompt.
-        A session prompt will be shown, the resulting input will be processed
-        """
-
-        # create and show prompt
-        text: str = self.session.prompt(
-            prompt_txt,
-            bottom_toolbar=self.bottom_toolbar,
-            complete_while_typing=True,
-            style=style,
-        )
-
-        if text:
-            # process the input
-            try:
-                self.process_game_input(text)
-            except Exception:
-                self.not_valid()
-
-    def game_session(self) -> PromptSession:
+    def make_session(self) -> PromptSession:
         """
         Setup prompt toolkit session for dice
 
@@ -132,6 +94,12 @@ edit, e: execute calculations on a variable and change its value to the result
         )
 
         return PromptSession(completer=completer)
+
+    def error(self) -> None:
+        """
+        Overrides the default error function
+        """
+        print("Got an error!")
 
     def reset(self) -> None:
         response: str = input("Are you sure? [Y/N]: ")
@@ -206,7 +174,7 @@ edit, e: execute calculations on a variable and change its value to the result
         # run the edit
         self.edit(name, operator, float(val))
 
-    def process_game_input(self, command: str) -> None:
+    def process_input(self, command: str) -> None:
         """
         Process the input provided to the prompt
 

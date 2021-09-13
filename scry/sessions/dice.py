@@ -1,4 +1,4 @@
-from re import S
+from sessions.scrysession import ScrySession
 from typing import List
 from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import WordCompleter
@@ -6,7 +6,7 @@ from functions.general import clear_screen
 from functions.dice import coin, planar, dice_range, choose, roll
 
 
-class Dice:
+class Dice(ScrySession):
     """
     Dice session for the SolRing app
 
@@ -14,11 +14,7 @@ class Dice:
     """
 
     def __init__(self) -> None:
-        # create the dice session
-        self.session: PromptSession = self.dice_session()
-        # determine the SolRing toolbar text
-        self.bottom_toolbar: str = " SolRing: Scryfall inside your terminal"
-        # help message
+        ScrySession.__init__(self)
         self.help_msg: str = """Help
 roll: roll a die
     -> roll xdy+z -> roll x y-sided die and add z
@@ -50,38 +46,7 @@ range: return a number between a provided range
 clear, c: clear the screen
     """
 
-    def not_valid(self) -> None:
-        """
-        Function that prints a message when a command is not valid
-        """
-        print("Not a valid command!")
-
-    def error(self) -> None:
-        """
-        Function that prints a message when an error occurs
-        """
-        print("Got an error trying to fetch this card!")
-
-    def run(self) -> None:
-        """
-        Run the prompt.
-        A session prompt will be shown, the resulting input will be processed
-        """
-        # create and show prompt
-        text: str = self.session.prompt(
-            ">>> ",
-            bottom_toolbar=self.bottom_toolbar,
-            complete_while_typing=True,
-        )
-
-        if text:
-            # process the input
-            try:
-                self.process_dice_input(text)
-            except Exception:
-                self.not_valid()
-
-    def dice_session(self) -> PromptSession:
+    def make_session(self) -> PromptSession:
         """
         Setup prompt toolkit session for dice
 
@@ -106,7 +71,7 @@ clear, c: clear the screen
 
         return PromptSession(completer=completer)
 
-    def process_dice_input(self, command: str) -> None:
+    def process_input(self, command: str) -> None:
         """
         Process the input provided to the prompt
 

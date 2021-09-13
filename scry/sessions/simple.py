@@ -1,3 +1,4 @@
+from sessions.scrysession import ScrySession
 from api_processing.random import show_random, show_momir
 from api_processing.constants import ScryfallError
 from api_processing.simple import show_results
@@ -8,7 +9,7 @@ from functions.general import clear_screen
 from functions.widgets import prompt_txt, style
 
 
-class Simple:
+class Simple(ScrySession):
     """
     Simple session for the SolRing app
 
@@ -18,10 +19,7 @@ class Simple:
     """
 
     def __init__(self) -> None:
-        # create the session
-        self.session: PromptSession = self.simple_session()
-        # determine the SolRing toolbar text
-        self.bottom_toolbar: str = " SolRing: Scryfall inside your terminal"
+        ScrySession.__init__(self)
         # help message
         self.help_msg: str = """Help
 search: search scryfall for a card name
@@ -47,39 +45,7 @@ query: search scryfall for a card that is filteres based on a query string
 clear, c: clear the screen
         """
 
-    def not_valid(self) -> None:
-        """
-        Function that prints a message when a command is not valid
-        """
-        print("Not a valid command!")
-
-    def error(self) -> None:
-        """
-        Function that prints a message when an error occurs
-        """
-        print("Got an error trying to fetch this card!")
-
-    def run(self) -> None:
-        """
-        Run the prompt.
-        A session prompt will be shown the resulting input will be processed
-        """
-        # create and show prompt
-        text: str = self.session.prompt(
-            prompt_txt,
-            bottom_toolbar=self.bottom_toolbar,
-            complete_while_typing=True,
-            style=style,
-        )
-
-        if text:
-            # process the input
-            try:
-                self.process_simple_input(text)
-            except Exception:
-                self.not_valid()
-
-    def simple_session(self) -> PromptSession:
+    def make_session(self) -> PromptSession:
         """
         Setup prompt toolkit session for simple search
 
@@ -96,18 +62,17 @@ clear, c: clear the screen
                 "search": None,
                 "help": None,
                 "h": None,
-                "momir": None,
                 "query": {"random": {"?q="}, "search": {"?q="}, "?q=": None},
             }
         )
 
         return PromptSession(completer=completer, complete_while_typing=True)
 
-    def process_simple_input(self, command: str):
+    def process_input(self, command: str):
         """
         Process the input provided to the prompt
 
-        The commands are: clear | search | random | help | momir | query
+        The commands are: clear | search | random | help | query
 
         If no command is provided, search is the default
 
@@ -142,12 +107,6 @@ clear, c: clear the screen
         elif first_word == "random":
             # get a new random card from scryfall
             show_random()
-
-        elif first_word == "momir":
-            # get a new random card from scryfall wit a specific cmc
-            # this command is called momir because it could be usefull for
-            # people using the momir vig vanguard or playin the momir format
-            show_momir(int(commands[1]))
 
         elif first_word in {"help", "h"}:
             # get help
