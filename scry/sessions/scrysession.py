@@ -1,5 +1,5 @@
 from prompt_toolkit import PromptSession
-from functions.widgets import prompt_txt, style
+from functions.widgets import prompt_txt, style, bottom_toolbar
 
 class ScrySession:
     """
@@ -9,7 +9,7 @@ class ScrySession:
     def __init__(self) -> None:
         self.session = self.make_session()
         # determine the SolRing toolbar text
-        self.bottom_toolbar: str = " SolRing: Scryfall inside your terminal"
+        self.bottom_toolbar: str = bottom_toolbar
         # help message
         self.help_msg: str = "Help"
 

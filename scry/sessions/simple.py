@@ -6,7 +6,6 @@ from typing import List
 from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import NestedCompleter
 from functions.general import clear_screen
-from functions.widgets import prompt_txt, style
 
 
 class Simple(ScrySession):

@@ -9,10 +9,12 @@ style: Style = Style.from_dict(
         "frame": "bg: #aa00ff",
         "button.focused": "bg: #aa00ff",
         "frame.label": "bg: #dddddd",
-        "prompt_text": "fg: #ffffff",
+        "prompt_text": "fg: #dddddd",
     }
 )
 
 prompt_txt: list = [
     ("class:prompt_text", ">>> ")
 ]
+
+bottom_toolbar: str = " SolRing: Scryfall inside your terminal"
