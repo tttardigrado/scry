@@ -3,7 +3,7 @@ from typing import List
 from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import WordCompleter
 from functions.general import clear_screen
-from functions.dice import coin, planar, dice_range, choose, roll
+from functions.dice import coin, planar, dice_range, choose, roll, hand
 
 
 class Dice(ScrySession):
@@ -43,6 +43,11 @@ range: return a number between a provided range
     -> range 1 -2 -> one of: -2, -1, 0, 1
     -> range -1, -3 -> one of: -3, -2, -1
 
+hand: choose a random card from target player's hand
+    -> hand <number_of_cards> -> returns a number within [1, number_of_cards]
+    -> hand 7 -> one of: 1, 2, 3, 4, 5, 6, 7
+    -> hand -1 -> not valid
+
 clear, c: clear the screen
     """
 
@@ -58,6 +63,7 @@ clear, c: clear the screen
         completer: WordCompleter = WordCompleter(
             [
                 "roll",
+                "hand",
                 "coin",
                 "planar",
                 "choose",
@@ -93,6 +99,9 @@ clear, c: clear the screen
             # roll planar die
             # blank, planeswalk, chaos
             print(planar(), "\n")
+
+        elif first_word == "hand":
+            print(hand(int(command_list[1])), "\n")
 
         elif first_word == "choose":
             # choose one of the values provided by the user

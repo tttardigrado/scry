@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from functions.general import wrap_txt
 from functions.widgets import style
 from prompt_toolkit import HTML
 from prompt_toolkit.shortcuts.dialogs import (
@@ -7,14 +7,25 @@ from prompt_toolkit.shortcuts.dialogs import (
     Application,
 )
 
+
 @dataclass()
 class Plane:
+    """
+    Plane card for the planechase format
+    """
     name: str = ""
     plane: str = ""
     text: str = ""
     chaos: str = ""
-    
+
+    def __post_init__(self):
+        self.text = wrap_txt(self.text)
+        self.chaos = wrap_txt(self.chaos, width=40)
+
     def widget_text(self) -> str:
+        """
+        Text for the plane widget
+        """
         return f"""
 — — — — —
 {self.name}
@@ -23,11 +34,20 @@ class Plane:
 — — — — —
 {self.text}
 — — — — —
-Whenever you roll ꩜, {self.chaos}
+Whenever you roll ꩜ , {self.chaos}
 — — — — —
 """
 
-    def widget(self, index) -> Application:
+    def widget(self, index: int) -> Application:
+        """
+        Widget for the Plane card
+
+        Args:
+            index (int): index of the card on the deck
+
+        Returns:
+            Application: Widget for this card
+        """
         return button_dialog(
             title=f"{self.name} — {index}",
             style=style,

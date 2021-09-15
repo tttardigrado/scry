@@ -13,8 +13,6 @@ style: Style = Style.from_dict(
     }
 )
 
-prompt_txt: list = [
-    ("class:prompt_text", ">>> ")
-]
+prompt_txt: list = [("class:prompt_text", ">>> ")]
 
 bottom_toolbar: str = " SolRing: Scryfall inside your terminal"

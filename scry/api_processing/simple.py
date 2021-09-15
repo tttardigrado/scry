@@ -6,8 +6,16 @@ import requests
 
 
 def simple_search(query: str) -> dict:
+    """
+    Query scryfall for a card
+
+    Args:
+        query (str): string that filters the scryfall results
+    """
+    # setup the query 
     query = query.strip().replace(" ", "%20")
 
+    # request the search to the scryfall api
     r = requests.get("https://api.scryfall.com/cards/search" + query)
 
     if r.status_code == 404:
@@ -18,6 +26,12 @@ def simple_search(query: str) -> dict:
 
 
 def show_results(query: str) -> None:
+    """
+    Show the results as a widget of radio list
+
+    Args:
+        query (str): string that filters the scryfall results
+    """
     # process the query string
     query = setup_query(query)
 

@@ -1,5 +1,5 @@
 from sessions.scrysession import ScrySession
-from api_processing.random import show_random, show_momir
+from api_processing.random import show_random
 from api_processing.constants import ScryfallError
 from api_processing.simple import show_results
 from typing import List

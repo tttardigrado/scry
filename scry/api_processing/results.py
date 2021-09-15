@@ -2,7 +2,7 @@ import requests
 from dataclasses import dataclass, field
 from typing import List, Dict
 from functions.widgets import style
-from functions.general import open_on_browser, replace_symbols
+from functions.general import open_on_browser, replace_symbols, wrap_txt
 from prompt_toolkit import HTML
 from prompt_toolkit.shortcuts.dialogs import (
     button_dialog,
@@ -11,7 +11,10 @@ from prompt_toolkit.shortcuts.dialogs import (
 )
 from prompt_toolkit.styles import Style
 
-card_back_link: str = "https://c1.scryfall.com/file/scryfall-card-backs/large/59/597b79b3-7d77-4261-871a-60dd17403388.jpg?1562636819"
+
+card_back_link: str = (
+    "https://c1.scryfall.com/file/scryfall-card-backs/large/59/597b79b3-7d77-4261-871a-60dd17403388.jpg?1562636819"
+)
 
 
 def make_legality(legality: dict) -> Dict[str, List[str]]:
@@ -29,6 +32,7 @@ def make_image_link(card: dict) -> str:
         return card["image_uris"]["png"]
     except Exception:
         return card_back_link
+
 
 @dataclass()
 class Card:
@@ -79,12 +83,13 @@ class Card:
 <b>TypeLine: </b>{self.typeline}
 
 — — — — —
-{self.text}
+
+{wrap_txt(self.text)}
 """
         if self.lore != "No Flavor Text":
-            text += f"\n<ansiblue>{self.lore}</ansiblue>\n"
+            text += f"<ansiblue>{wrap_txt(self.lore)}</ansiblue>\n"
 
-        text += "\n— — — — —"
+        text += "— — — — —"
         if self.is_creature():
             text += f"\n<b>P/T:</b> {self.power}/{self.toughness}\n\n— — — — —"
         elif self.is_pw():
@@ -111,11 +116,14 @@ class Card:
         text = replace_symbols(text)
         return text
 
-    def widget(self) -> Application:
+    def widget(
+            self,
+            btn: list = [("Ok", 1), ("Open", 2), ("Download", 3)],
+    ) -> Application:
         return button_dialog(
             title=self.name,
             style=style,
-            buttons=[("Ok", 1), ("Open", 2), ("Download", 3)],
+            buttons=btn,
             text=HTML(self.widget_text()),
         )
 
@@ -124,10 +132,13 @@ class Card:
         with open(self.name + ".png", "wb") as handler:
             handler.write(img_data)
 
+    def open_card(self) -> None:
+        open_on_browser(self.url)
+
     def show(self) -> None:
         value: int = self.widget().run()
         if value == 2:
-            open_on_browser(self.url)
+            self.open_card()
         elif value == 3:
             self.download_card()
 

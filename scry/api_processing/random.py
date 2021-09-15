@@ -9,7 +9,7 @@ def random_card(query: str = "") -> dict:
     Get a random card from scryfall
 
     Args:
-        query (str): query string to provide to the scryfall api.
+        query (str, optional): query string to provide to the scryfall api.
             Defaults to ""
 
     Raises:
@@ -35,6 +35,14 @@ def random_card(query: str = "") -> dict:
 
 
 def show_momir(cmc: int) -> None:
+    """
+    Get and display a random creature card with a specified cmc
+    It's called momir, because the momir basic format is based on
+    getting random creatures with a specific cmc.
+
+    Args:
+        cmc (int): converted mana cost of the card
+    """
     # cmc%3D{cmc}
     #   -> query string for a specific cmc
     #
@@ -44,6 +52,13 @@ def show_momir(cmc: int) -> None:
 
 
 def show_random(query: str = "") -> None:
+    """
+    Get and display a random card from scryfall
+
+    Args:
+        query (str, optional): a string providing filters for scryfall.
+        Defaults to "".
+    """
     # process the query string
     query = setup_query(query)
 

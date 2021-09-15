@@ -1,10 +1,14 @@
 from typing import List
-from prompt_toolkit import PromptSession
+from random import choice
+from prompt_toolkit import PromptSession, print_formatted_text
 from prompt_toolkit.completion import NestedCompleter
+from prompt_toolkit.formatted_text.html import HTML
 from functions.general import clear_screen
 from api_processing.planechase import planar_deck
 from api_processing.random import show_momir
+from api_processing.booster import Booster
 from functions.dice import planar
+from functions.constants import chaos_effects
 
 
 class Mode:
@@ -17,6 +21,10 @@ class Mode:
     def __init__(self) -> None:
         # create planechase
         self.planechase = planar_deck
+        # chaos effects for the CHAOS MAGIC format
+        self.chaos_deck: List[str] = chaos_effects
+        # draft booster for random booster searches
+        self.booster: Booster = Booster(set_code="lea", cards=[], index=0)
         # create the dice session
         self.session: PromptSession = self.mode_session()
         # determine the SolRing toolbar text
@@ -66,10 +74,12 @@ class Mode:
         # completer for the dice session
         completer: NestedCompleter = NestedCompleter.from_nested_dict(
             {
+                "chaos": None,
                 "planar": None,
                 "planechase": None,
                 "momir": None,
-                "new": {"planechase", "archenemy"},
+                "draft": None,
+                "new": {"planechase", "archenemy", "draft"},
                 "clear": None,
                 "c": None,
                 "help": None,
@@ -103,12 +113,19 @@ class Mode:
             # people using the momir vig vanguard or playin the momir format
             show_momir(int(command_list[1]))
 
+        elif first_word == "draft":
+            self.booster.run()
+
         elif first_word == "archenemy":
             pass
 
         elif first_word == "planar":
             # roll a planar die
             print(planar())
+
+        elif first_word == "chaos":
+            # print a random chaos effects
+            print_formatted_text(HTML(choice(self.chaos_deck)))
 
         elif first_word == "new":
             mode: str = command_list[1]
@@ -117,6 +134,10 @@ class Mode:
                 # reset an run a new planechase planar deck
                 self.planechase.shuffle()
                 self.planechase.run()
+
+            elif mode == "draft":
+                self.booster.reset_booster(command_list[2])
+                self.booster.run()
 
             elif mode == "archenemy":
                 pass

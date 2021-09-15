@@ -46,10 +46,10 @@ def planar() -> str:
 
 def dice_range(value: str) -> int:
     """
-    Random nmber from a specified range
+    Random number from a specified range
 
     Args:
-        value (str): string to be processed and 
+        value (str): string to be processed and
         get the start and end values of the range
 
     Raises:
@@ -76,6 +76,32 @@ def dice_range(value: str) -> int:
 
     # choose number
     return random.choice(range(first, second + 1))
+
+
+def hand(number_of_cards: int) -> int:
+    """
+    Random card from a hand o <number_of_cards> cards.
+    Before calling this function the player should define a number
+    for each card in their hand, the card corresponding
+    to the returned number should be subjected to the effect that made
+    the player call this function
+
+    Example:
+        Target player discards a card at random.
+        cards in hand == 6
+        order the cards from 1 to 6 on the table
+        -> hand 6
+        -> -> return an integer between 1 and 6 (lets say it returned 4)
+        the player discards card 4
+
+    Args:
+        number_of_cards (int): number of cards that target
+            player has in their hand.
+
+    Returns:
+        int: random integer contained within [1, number_of_cards]
+    """
+    return random.randint(1, number_of_cards)
 
 
 def choose(value: str) -> str:
@@ -113,7 +139,7 @@ def roll_dice(times: int, sides: int, modifier: int) -> int:
         value: int = random.randint(1, sides)
         # update result
         result += value
-        # print 
+        # print
         # ex: 2: 5
         print(f"{i+1}: {value}")
 

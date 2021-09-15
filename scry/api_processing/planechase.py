@@ -9,23 +9,40 @@ Planechase_Card = Union[Plane, Phenomenon]
 
 @dataclass()
 class Planechase:
+    """
+    Planechase deck for the planechase format
+    """
     deck: List[Planechase_Card]
     length: int
     index: int
 
     def shuffle(self) -> None:
+        """
+        Shuffle the deck and reset the index
+        """
         shuffle(self.deck)
+        # reset the index
         self.index = 0
 
     def run(self) -> None:
+        """
+        Run the planechase deck
+        """
         while True:
             value: int = self.deck[self.index].widget(self.index).run()
 
             if value == 1 and self.index > 0:
+                # command == Prev
+                # can't have an index bellow 0
                 self.index -= 1
+
             elif value == 2 and self.index < self.length - 1:
+                # command == Next
+                # can't have an index larger than the number of cards
                 self.index += 1
+
             elif value == 3:
+                # quit
                 break
 
 

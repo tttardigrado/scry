@@ -1,6 +1,7 @@
 from prompt_toolkit import PromptSession
 from functions.widgets import prompt_txt, style, bottom_toolbar
 
+
 class ScrySession:
     """
     Base class for Scry Sessions
