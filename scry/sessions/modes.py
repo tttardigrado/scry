@@ -9,9 +9,10 @@ from api_processing.random import show_momir
 from api_processing.booster import Booster
 from functions.dice import planar
 from functions.constants import chaos_effects
+from sessions.scrysession import ScrySession
 
 
-class Mode:
+class Mode(ScrySession):
     """
     Game modes session for the SolRing app
 
@@ -19,51 +20,40 @@ class Mode:
     """
 
     def __init__(self) -> None:
+        ScrySession.__init__(self)
+
         # create planechase
         self.planechase = planar_deck
         # chaos effects for the CHAOS MAGIC format
         self.chaos_deck: List[str] = chaos_effects
         # draft booster for random booster searches
         self.booster: Booster = Booster(set_code="lea", cards=[], index=0)
-        # create the dice session
-        self.session: PromptSession = self.mode_session()
-        # determine the SolRing toolbar text
-        self.bottom_toolbar: str = " SolRing: Scryfall inside your terminal"
         # help message
-        self.help_msg: str = "Help"
+        self.help_msg: str = """Help
+chaos: random chaotic effect. Can be beneficial or not. Run it every upkeep
 
-    def not_valid(self) -> None:
-        """
-        Function that prints a message when a command is not valid
-        """
-        print("Not a valid command!")
+planar: roll a planar die
+    -> 4 blanks, 1 chaos, 1 planeswalk
 
-    def error(self) -> None:
-        """
-        Function that prints a message when an error occurs
-        """
-        print("Got an error trying to fetch this card!")
+planechase: Show the planechase planar deck. Used for the planechase variant
 
-    def run(self) -> None:
-        """
-        Run the prompt.
-        A session prompt will be shown, the resulting input will be processed
-        """
-        # create and show prompt
-        text: str = self.session.prompt(
-            ">>> ",
-            bottom_toolbar=self.bottom_toolbar,
-            complete_while_typing=True,
-        )
+momir: get a random creature card with a specific cmc. Used for momir basic
+    -> momir <cmc> -> random creature with cmc==<cmc>
+    -> momir 2 -> random creature with cmc==2
+    -> momir 10 -> random creature with cmc==100
+    -> momir 14 -> error, there is currently no creature with cmc==14
 
-        if text:
-            # process the input
-            try:
-                self.process_mode_input(text)
-            except Exception:
-                self.not_valid()
+draft: show thw currently open booster
 
-    def mode_session(self) -> PromptSession:
+new: reset a specific game mode
+    -> new draft <set_code> -> get a new booster for the set with the
+        specified <set_code> (3 letter code that identifies it: AFR, KLD, ELD)
+    -> new planechase -> shuffle and present a new planechase deck
+
+clear, c: clear the screen
+    """
+
+    def make_session(self) -> PromptSession:
         """
         Setup prompt toolkit session for game modes
 
@@ -89,7 +79,7 @@ class Mode:
 
         return PromptSession(completer=completer)
 
-    def process_mode_input(self, command: str) -> None:
+    def process_input(self, command: str) -> None:
         """
         Process the input provided to the prompt
 
