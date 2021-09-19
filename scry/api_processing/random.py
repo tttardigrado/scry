@@ -1,6 +1,6 @@
-from api_processing.results import Card, json_to_card
-from api_processing.constants import ScryfallError
-from functions import setup_query
+from scry.api_processing.results import Card, json_to_card
+from scry.api_processing.constants import ScryfallError
+from scry.functions.general import setup_query
 import requests
 
 

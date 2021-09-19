@@ -1,9 +1,9 @@
-from sessions.scrysession import ScrySession
+import re
 from typing import Dict, List
 from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import NestedCompleter
-from functions.general import clear_screen
-import re
+from scry.functions.general import clear_screen
+from scry.sessions.scrysession import ScrySession
 
 
 class Game(ScrySession):

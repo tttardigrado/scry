@@ -4,10 +4,10 @@ from typing import List, Tuple
 from prompt_toolkit.application.application import Application
 from prompt_toolkit.styles.style import Style
 from prompt_toolkit.shortcuts.dialogs import radiolist_dialog
-from api_processing.random import random_card
-from api_processing.results import Card, json_to_card
-from functions.general import replace_symbols
-from functions.widgets import style
+from scry.api_processing.random import random_card
+from scry.api_processing.results import Card, json_to_card
+from scry.functions.general import replace_symbols, clear_screen
+from scry.functions.widgets import style
 
 
 @dataclass()
@@ -198,6 +198,43 @@ Please try to buy a new booster using:
 
         return radiolist_dialog(title=title, values=values, style=style)
 
+    def loop(self, card_buttons: List[Tuple[str, int]]) -> None:
+        """
+        Keep showing and executing the requested actions until he quits
+        """
+        while True:
+            # get the current card
+            card: Card = self.cards[self.index]
+
+            # run that card's widget
+            value: int = card.widget(btn=card_buttons).run()
+
+            # process the input from the widget
+            if value == 1 and self.index > 0:
+                # command == Previous
+                # can't go under 0
+                self.index -= 1
+
+            elif value == 2 and self.index < 14:
+                # command == Next
+                # can't go over the 15th (index 14) card
+                self.index += 1
+
+            elif value == 3:
+                # command == Ok
+                # exit the booster run loop
+                break
+
+            elif value == 4:
+                # command == Open
+                # open the card on the browser
+                card.open_card()
+
+            elif value == 5:
+                # command == Download
+                # Download the card's image to the current folder
+                card.download_card()
+
     def run(self) -> None:
         """
         Run this Booster
@@ -223,36 +260,5 @@ Please try to buy a new booster using:
                 ("Open", 4),
                 ("Download", 5),
             ]
-
-            while True:
-                # get the current card
-                card: Card = self.cards[self.index]
-
-                # run that card's widget
-                value: int = card.widget(btn=card_buttons).run()
-
-                # process the input from the widget
-                if value == 1 and self.index > 0:
-                    # command == Previous
-                    # can't go under 0
-                    self.index -= 1
-
-                elif value == 2 and self.index < 14:
-                    # command == Next
-                    # can't go over the 15th (index 14) card
-                    self.index += 1
-
-                elif value == 3:
-                    # command == Ok
-                    # exit the booster run loop
-                    break
-
-                elif value == 4:
-                    # command == Open
-                    # open the card on the browser
-                    card.open_card()
-
-                elif value == 5:
-                    # command == Download
-                    # Download the card's image to the current folder
-                    card.download_card()
+            clear_screen()
+            self.loop(card_buttons)

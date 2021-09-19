@@ -1,9 +1,20 @@
-from sessions.scrysession import ScrySession
+from re import M
 from typing import List
 from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import WordCompleter
-from functions.general import clear_screen
-from functions.dice import coin, planar, dice_range, choose, roll, hand
+from prompt_toolkit.completion.nested import NestedCompleter
+from scry.functions.general import clear_screen, pprint_dice
+from scry.functions.dice import (
+    coin,
+    planar,
+    dice_range,
+    choose,
+    roll,
+    hand,
+    roll_adv,
+    roll_dis,
+)
+from scry.sessions.scrysession import ScrySession
 
 
 class Dice(ScrySession):
@@ -60,19 +71,23 @@ clear, c: clear the screen
         """
 
         # completer for the dice session
-        completer: WordCompleter = WordCompleter(
-            [
-                "roll",
-                "hand",
-                "coin",
-                "planar",
-                "choose",
-                "range",
-                "clear",
-                "c",
-                "help",
-                "h",
-            ]
+        completer: NestedCompleter = NestedCompleter.from_nested_dict(
+            {
+                "roll": {"adv", "advantage", "dis", "disadvantage"},
+                "adv": None,
+                "advantage": None,
+                "dis": None,
+                "disadvantage": None,
+                "hand": None,
+                "coin": None,
+                "planar": None,
+                "choose": None,
+                "range": None,
+                "clear": None,
+                "c": None,
+                "help": None,
+                "h": None,
+            }
         )
 
         return PromptSession(completer=completer)
@@ -93,27 +108,55 @@ clear, c: clear the screen
         if first_word == "coin":
             # flip a coin
             # heads or tails
-            print(coin(), "\n")
+            pprint_dice(coin())
 
         elif first_word == "planar":
             # roll planar die
             # blank, planeswalk, chaos
-            print(planar(), "\n")
+            pprint_dice(planar())
 
         elif first_word == "hand":
-            print(hand(int(command_list[1])), "\n")
+            # choose one card from hand
+            pprint_dice(hand(int(command_list[1])))
 
         elif first_word == "choose":
             # choose one of the values provided by the user
-            print(choose(" ".join(command_list[1:])), "\n")
+            pprint_dice(choose(" ".join(command_list[1:])))
 
         elif first_word == "range":
             # choose a number from a specified range
-            print(dice_range(" ".join(command_list[1:])), "\n")
+            pprint_dice(dice_range(" ".join(command_list[1:])))
 
         elif first_word == "roll":
-            # roll a die
-            print(roll(" ".join(command_list[1:])), "\n")
+            mode: str = command_list[1]
+
+            if mode in {"adv", "advantage"}:
+                # roll with advantage
+                # advantage means that 2 dice are rolled
+                # and the largest one is considered
+                pprint_dice(roll_adv("".join(command_list[2:])))
+
+            elif mode in {"dis", "disadvantage"}:
+                # roll with disadvantage
+                # disadvantage means that 2 dice are rolled
+                # and the smallest one is considere
+                pprint_dice(roll_dis("".join(command_list[2:])))
+
+            else:
+                # roll a die
+                pprint_dice(roll("".join(command_list[1:])))
+
+        elif first_word in {"adv", "advantage"}:
+            # roll with advantage
+            # advantage means that 2 dice are rolled
+            # and the largest one is considered
+            pprint_dice(roll_adv("".join(command_list[1:])))
+
+        elif first_word in {"dis", "disadvantage"}:
+            # roll with advantage
+            # advantage means that 2 dice are rolled
+            # and the largest one is considered
+            pprint_dice(roll_adv("".join(command_list[1:])))
 
         elif first_word in {"clear", "c"}:
             # clear the screen

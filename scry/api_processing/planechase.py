@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Union
-from api_processing.planes import Plane
-from api_processing.phenomenon import Phenomenon
+from scry.api_processing.planes import Plane
+from scry.api_processing.phenomenon import Phenomenon
 from random import shuffle
 
 Planechase_Card = Union[Plane, Phenomenon]

@@ -1,5 +1,5 @@
 from prompt_toolkit import PromptSession
-from functions.widgets import prompt_txt, style, bottom_toolbar
+from scry.functions.widgets import prompt_txt, style, bottom_toolbar
 
 
 class ScrySession:

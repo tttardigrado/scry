@@ -1,8 +1,8 @@
 import click
-from sessions.simple import Simple
-from sessions.dice import Dice
-from sessions.game import Game
-from sessions.modes import Mode
+from scry.sessions.simple import Simple
+from scry.sessions.dice import Dice
+from scry.sessions.game import Game
+from scry.sessions.modes import Mode
 
 
 @click.command()

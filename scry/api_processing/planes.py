@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from functions.general import wrap_txt
-from functions.widgets import style
+from scry.functions.general import wrap_txt
+from scry.functions.widgets import style
 from prompt_toolkit import HTML
 from prompt_toolkit.shortcuts.dialogs import (
     button_dialog,

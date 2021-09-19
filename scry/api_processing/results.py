@@ -1,14 +1,11 @@
 import requests
 from dataclasses import dataclass, field
 from typing import List, Dict
-from functions.widgets import style
-from functions.general import open_on_browser, replace_symbols, wrap_txt
+from scry.functions.widgets import style
+from scry.functions.general import open_on_browser, replace_symbols, wrap_txt
 from prompt_toolkit import HTML
-from prompt_toolkit.shortcuts.dialogs import (
-    button_dialog,
-    radiolist_dialog,
-    Application,
-)
+from prompt_toolkit.shortcuts.dialogs import button_dialog, radiolist_dialog
+from prompt_toolkit.application import Application
 from prompt_toolkit.styles import Style
 
 
@@ -117,14 +114,10 @@ class Card:
         return text
 
     def widget(
-            self,
-            btn: list = [("Ok", 1), ("Open", 2), ("Download", 3)],
+        self, btn: list = [("Ok", 1), ("Open", 2), ("Download", 3)]
     ) -> Application:
         return button_dialog(
-            title=self.name,
-            style=style,
-            buttons=btn,
-            text=HTML(self.widget_text()),
+            title=self.name, style=style, buttons=btn, text=HTML(self.widget_text())
         )
 
     def download_card(self) -> None:

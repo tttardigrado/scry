@@ -1,15 +1,17 @@
+from scry.api_processing.archenemy.arch_deck import archenemy_decks
+from scry.api_processing.archenemy.decks import ArchenemyDeck
 from typing import List
 from random import choice
 from prompt_toolkit import PromptSession, print_formatted_text
 from prompt_toolkit.completion import NestedCompleter
 from prompt_toolkit.formatted_text.html import HTML
-from functions.general import clear_screen
-from api_processing.planechase import planar_deck
-from api_processing.random import show_momir
-from api_processing.booster import Booster
-from functions.dice import planar
-from functions.constants import chaos_effects
-from sessions.scrysession import ScrySession
+from scry.api_processing.planechase import planar_deck
+from scry.api_processing.random import show_momir
+from scry.api_processing.booster import Booster
+from scry.functions.dice import planar
+from scry.functions.general import clear_screen
+from scry.functions.constants import chaos_effects
+from scry.sessions.scrysession import ScrySession
 
 
 class Mode(ScrySession):
@@ -26,6 +28,8 @@ class Mode(ScrySession):
         self.planechase = planar_deck
         # chaos effects for the CHAOS MAGIC format
         self.chaos_deck: List[str] = chaos_effects
+        # scheme deck for the archenemy format
+        self.scheme_deck: ArchenemyDeck = archenemy_decks["apocalypse"]
         # draft booster for random booster searches
         self.booster: Booster = Booster(set_code="lea", cards=[], index=0)
         # help message
@@ -36,6 +40,11 @@ planar: roll a planar die
     -> 4 blanks, 1 chaos, 1 planeswalk
 
 planechase: Show the planechase planar deck. Used for the planechase variant
+
+archenemy: Show the archenemy Scheme deck. Used fot the archenemy variant
+    -> archenemy deck -> shows the current deck
+    -> archenemy ongoing -> shows the currently activated ongoing schemes
+    -> archenemy abandon -> radio prompt to abandon an ongoing scheme
 
 momir: get a random creature card with a specific cmc. Used for momir basic
     -> momir <cmc> -> random creature with cmc==<cmc>
@@ -49,6 +58,13 @@ new: reset a specific game mode
     -> new draft <set_code> -> get a new booster for the set with the
         specified <set_code> (3 letter code that identifies it: AFR, KLD, ELD)
     -> new planechase -> shuffle and present a new planechase deck
+    -> new archenemy <deck_name> -> change and suffle a new schemes deck
+        -> The available decks are:
+            -> apocalypse
+            -> doomsday
+            -> tramble
+            -> dragonfire
+            -> bolas
 
 clear, c: clear the screen
     """
@@ -69,7 +85,12 @@ clear, c: clear the screen
                 "planechase": None,
                 "momir": None,
                 "draft": None,
-                "new": {"planechase", "archenemy", "draft"},
+                "archenemy": {"deck", "ongoing", "abandon"},
+                "new": {
+                    "planechase": None,
+                    "archenemy": {deck for deck in archenemy_decks},
+                    "draft": None,
+                },
                 "clear": None,
                 "c": None,
                 "help": None,
@@ -107,7 +128,16 @@ clear, c: clear the screen
             self.booster.run()
 
         elif first_word == "archenemy":
-            pass
+            mode: str = command_list[1]
+
+            if mode == "deck":
+                self.scheme_deck.run()
+
+            elif mode == "ongoing":
+                self.scheme_deck.run_ongoing()
+
+            elif mode == "abandon":
+                self.scheme_deck.remove_ungoing()
 
         elif first_word == "planar":
             # roll a planar die
@@ -130,7 +160,8 @@ clear, c: clear the screen
                 self.booster.run()
 
             elif mode == "archenemy":
-                pass
+                self.scheme_deck = archenemy_decks[command_list[2]]
+                self.scheme_deck.shuffle()
 
         elif first_word in {"clear", "c"}:
             # clear the screen

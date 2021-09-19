@@ -4,24 +4,17 @@ import re
 
 # expression to match dice rolling.
 # ex: 2d6-4 -> roll 2 d6 and subtract 4 to their sum
-dice_expr: re.Pattern = re.compile(r"^(\d+)?d(\d+)\+?(\-?\d+)?$")
+dice_expr = re.compile(r"^(\d+)?d(\d+)\+?(\-?\d+)?$")
 
 # expression to match ranges
 # ex: 3 -20 -> choose a number between -3 and 20
-range_expr: re.Pattern = re.compile(r"^(\-?\d+)\s+(\-?\d+)$")
+range_expr = re.compile(r"^(\-?\d+)\s+(\-?\d+)$")
 
 # sides of a coin
 coin_values: List[str] = ["Heads", "Tails"]
 
 # faces of a planar die
-planar_values: List[str] = [
-    "Blank",
-    "Blank",
-    "Blank",
-    "Blank",
-    "Planeswalk",
-    "Chaos",
-]
+planar_values: List[str] = ["Blank", "Blank", "Blank", "Blank", "Planeswalk", "Chaos"]
 
 
 def coin() -> str:
@@ -178,3 +171,69 @@ def roll(value: str) -> int:
     value_modifier = int(value_modifier or 0)  # 0 is defalt
 
     return roll_dice(times_to_roll, sides, value_modifier)
+
+
+def roll_adv_or_dis(value: str, times: int = 2) -> List[int]:
+    """
+    Roll with advantage (2 dice, larger gets counted)
+    Roll with disadvantage (2 dice, smalled gets counted)
+
+    Args:
+        value (str): dice expression that should be rolled
+
+    Raises:
+        ValueError: if value is not provided or is ""
+
+    Returns:
+        List[int]: the 2 values rolled by the dice
+    """
+    if not value:
+        raise ValueError
+
+    rolls: List[int] = []
+
+    # roll dice
+    for i in range(times):
+        print(f"\n— — —({i+1})— — —")
+        # rolls
+        result: int = roll(value)
+        print(result)
+        rolls.append(result)
+
+    return rolls
+
+
+def roll_adv(value: str, times: int = 2) -> int:
+    """
+    Roll with advantage
+    (more than 1 dice are rolled and the largest is counted)
+
+    Args:
+        value (str): dice expression to be rolled
+        times (int): number of times the dice should be rolled
+
+    Returns:
+        int: the largest of the rolled dice
+    """
+    rolls: List[int] = roll_adv_or_dis(value, times)
+
+    # return the largest
+    return max(rolls)
+
+
+def roll_dis(value: str, times: int = 2) -> int:
+    """
+    Roll with disadvantage
+    (more than 1 dice are rolled and the smallest is counted)
+
+    Args:
+        value (str): dice expression to be rolled
+        times (int): number of times the dice should be rolled
+
+    Returns:
+        int: the smaller of the rolled dice
+    """
+    rolls: List[int] = roll_adv_or_dis(value, times)
+
+    # return the smaller
+    return min(rolls)

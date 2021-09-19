@@ -1,4 +1,5 @@
 from os import system
+from typing import Any
 import webbrowser
 from textwrap import wrap
 
@@ -81,3 +82,7 @@ def wrap_txt(text: str, width: int = 60, separator: str = "\n") -> str:
         wrapped += separator
 
     return wrapped
+
+
+def pprint_dice(value: Any) -> None:
+    print(f"\n——— {value} ———\n")

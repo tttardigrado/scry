@@ -1,8 +1,8 @@
-from functions.general import setup_query
-from api_processing.constants import ScryfallError
-from api_processing.results import Results, dict_to_list_of_cards
-from functions.widgets import style
 import requests
+from scry.api_processing.constants import ScryfallError
+from scry.api_processing.results import Results, dict_to_list_of_cards
+from scry.functions.widgets import style
+from scry.functions.general import setup_query
 
 
 def simple_search(query: str) -> dict:

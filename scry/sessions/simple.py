@@ -1,11 +1,11 @@
-from sessions.scrysession import ScrySession
-from api_processing.random import show_random
-from api_processing.constants import ScryfallError
-from api_processing.simple import show_results
 from typing import List
 from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import NestedCompleter
-from functions.general import clear_screen
+from scry.functions.general import clear_screen
+from scry.sessions.scrysession import ScrySession
+from scry.api_processing.random import show_random
+from scry.api_processing.constants import ScryfallError
+from scry.api_processing.simple import show_results
 
 
 class Simple(ScrySession):
