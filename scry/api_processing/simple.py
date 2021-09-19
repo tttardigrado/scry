@@ -12,7 +12,7 @@ def simple_search(query: str) -> dict:
     Args:
         query (str): string that filters the scryfall results
     """
-    # setup the query 
+    # setup the query
     query = query.strip().replace(" ", "%20")
 
     # request the search to the scryfall api

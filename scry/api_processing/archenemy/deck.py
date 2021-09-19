@@ -1,4 +1,4 @@
-from scry.api_processing.archenemy.decks import ArchenemyDeck
+from scry.api_processing.archenemy.archenemy_decks import ArchenemyDeck
 import scry.api_processing.archenemy.cards as c
 from typing import Dict
 

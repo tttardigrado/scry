@@ -1,11 +1,11 @@
-from scry.api_processing.archenemy.arch_deck import archenemy_decks
-from scry.api_processing.archenemy.decks import ArchenemyDeck
+from scry.api_processing.archenemy.deck import archenemy_decks
+from scry.api_processing.archenemy.archenemy_decks import ArchenemyDeck
 from typing import List
 from random import choice
 from prompt_toolkit import PromptSession, print_formatted_text
 from prompt_toolkit.completion import NestedCompleter
 from prompt_toolkit.formatted_text.html import HTML
-from scry.api_processing.planechase import planar_deck
+from scry.api_processing.planechase.planechase import planar_deck
 from scry.api_processing.random import show_momir
 from scry.api_processing.booster import Booster
 from scry.functions.dice import planar

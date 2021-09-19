@@ -1,7 +1,5 @@
-from re import M
 from typing import List
 from prompt_toolkit import PromptSession
-from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.completion.nested import NestedCompleter
 from scry.functions.general import clear_screen, pprint_dice
 from scry.functions.dice import (
