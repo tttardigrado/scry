@@ -1,11 +1,11 @@
 from random import randint
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from prompt_toolkit.application.application import Application
 from prompt_toolkit.styles.style import Style
 from prompt_toolkit.shortcuts.dialogs import radiolist_dialog
 from scry.api_processing.random import random_card
-from scry.api_processing.results import Card, json_to_card
+from scry.api_processing.results import Card, DFCCard, json_to_card
 from scry.functions.general import replace_symbols, clear_screen
 from scry.functions.widgets import style
 
@@ -17,7 +17,7 @@ class Booster:
     """
 
     set_code: str
-    cards: List[Card]
+    cards: List[Union[Card, DFCCard]]
     index: int = 0
 
     def booster_is_empty(self) -> None:
@@ -30,7 +30,7 @@ Please try to buy a new booster using:
     new draft <3_letter_set_code>"""
         )
 
-    def random_booster_card(self, rarity: str) -> Card:
+    def random_booster_card(self, rarity: str) -> Union[Card, DFCCard]:
         """
         Get a random card from a specific set and a specific rarity
         The set code is provided by the booster calss
@@ -43,7 +43,7 @@ Please try to buy a new booster using:
                 "m" -> mythic
 
         Returns:
-            Card: A card object for the card got from scryfall
+            Card | DFCCard: A card object for the card got from scryfall
         """
         # generate the query string
         query: str = f"?q=-type%3Abasic+set%3A{self.set_code}+rarity%3A{rarity}"
@@ -202,9 +202,18 @@ Please try to buy a new booster using:
         """
         Keep showing and executing the requested actions until he quits
         """
+
+        dfc_buttons: List[Tuple[str, int]] = card_buttons
+        non_dfc_buttons: List[Tuple[str, int]] = card_buttons[:-1]
+
         while True:
             # get the current card
-            card: Card = self.cards[self.index]
+            card: Union[Card, DFCCard] = self.cards[self.index]
+
+            if type(card) == DFCCard:
+                card_buttons = dfc_buttons
+            else:
+                card_buttons = non_dfc_buttons
 
             # run that card's widget
             value: int = card.widget(btn=card_buttons).run()
@@ -233,7 +242,12 @@ Please try to buy a new booster using:
             elif value == 5:
                 # command == Download
                 # Download the card's image to the current folder
-                card.download_card()
+                card.download_card(),
+            elif value == 6:
+                # command == Flip
+                # Flip a card
+                # only available on dfc cards
+                card.flip()
 
     def run(self) -> None:
         """
@@ -259,6 +273,7 @@ Please try to buy a new booster using:
                 ("Ok", 3),
                 ("Open", 4),
                 ("Download", 5),
+                ("Flip", 6),
             ]
             clear_screen()
             self.loop(card_buttons)

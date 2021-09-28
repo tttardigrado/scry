@@ -1,6 +1,6 @@
 import requests
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import List, Dict, Union
 from scry.functions.widgets import style
 from scry.functions.general import open_on_browser, replace_symbols, wrap_txt
 from prompt_toolkit import HTML
@@ -53,6 +53,9 @@ class Card:
     def is_creature(self) -> bool:
         return "creature" in self.typeline.lower()
 
+    def is_vehicle(self) -> bool:
+        return "vehicle" in self.typeline.lower()
+
     def is_pw(self) -> bool:
         return "planeswalker" in self.typeline.lower()
 
@@ -77,7 +80,7 @@ class Card:
 {self.name} — — — {self.cost}
 
 — — — — —
-<b>TypeLine: </b>{self.typeline}
+<ansigreen><b>TypeLine: </b>{self.typeline}</ansigreen>
 
 — — — — —
 
@@ -87,10 +90,10 @@ class Card:
             text += f"<ansiblue>{wrap_txt(self.lore)}</ansiblue>\n"
 
         text += "— — — — —"
-        if self.is_creature():
-            text += f"\n<b>P/T:</b> {self.power}/{self.toughness}\n\n— — — — —"
+        if self.is_creature() or self.is_vehicle():
+            text += f"\n<ansired><b>P/T:</b> {self.power}/{self.toughness}</ansired>\n\n— — — — —"
         elif self.is_pw():
-            text += f"\n<b>Loyalty:</b> {self.loyalty}\n\n— — — — —"
+            text += f"\n<ansired><b>Loyalty:</b> {self.loyalty}</ansired>\n\n— — — — —"
 
         text += f"""
 <b>Set:</b> {self.set_code}
@@ -136,7 +139,63 @@ class Card:
             self.download_card()
 
 
-def json_to_card(card: dict) -> Card:
+@dataclass()
+class DFCCard:
+    front: Card
+    back: Card
+    url: str = "https://scryfall.com/"
+    active: str = "front"
+    name: str = "No Name"
+    cost: str = "No Cost",
+    rarity: str = "C"
+
+    def widget(
+        self,
+        btn: list = [("Ok", 1), ("Open", 2), ("Download", 3), ("Flip", 4)]
+    ) -> Application:
+        text: str = ""
+        if self.active == "back":
+            text = self.back.widget_text()
+        else:
+            text = self.front.widget_text()
+        return button_dialog(
+            title=self.name, style=style, buttons=btn, text=HTML(text)
+        )
+
+    def download_card(self) -> None:
+        if self.active == "back":
+            self.back.download_card()
+        else:
+            self.front.download_card()
+
+    def open_card(self) -> None:
+        open_on_browser(self.url)
+
+    def flip(self) -> None:
+        if self.active == "back":
+            self.active = "front"
+        else:
+            self.active = "back"
+
+    def show(self) -> None:
+        while True:
+            value: int = self.widget().run()
+            if value == 2:
+                self.open_card()
+                break
+
+            elif value == 3:
+                self.download_card()
+                break
+
+            elif value == 4:
+                self.flip()
+                continue
+            else:
+                break
+
+
+def json_to_simple_card(card: dict) -> Card:
     legality: Dict[str, List[str]] = make_legality(card["legalities"])
     return Card(
         name=card.get("name") or "No Name",
@@ -158,8 +217,38 @@ def json_to_card(card: dict) -> Card:
     )
 
 
-def dict_to_list_of_cards(to_convert: dict) -> List[Card]:
-    results: List[Card] = []
+def json_to_dfc_card(card: dict) -> DFCCard:
+    front: dict = card["card_faces"][0]
+    back: dict = card["card_faces"][1]
+
+    front["legalities"] = card["legalities"]
+    back["legalities"] = card["legalities"]
+    front["rarity"] = card["rarity"]
+    back["rarity"] = card["rarity"]
+    front["set"] = card["set"]
+    back["set"] = card["set"]
+    front["collector_number"] = card["collector_number"]
+    back["collector_number"] = card["collector_number"]
+    return DFCCard(
+        front=json_to_simple_card(front),
+        back=json_to_simple_card(back),
+        url=card.get("scryfall_uri") or "https://scryfall.com/",
+        active="front",
+        name=card.get("name") or "No Name",
+        cost="DFC",
+        rarity=card.get("rarity") or "C"
+    )
+
+
+def json_to_card(card: dict) -> Union[Card, DFCCard]:
+    if card.get("card_faces"):
+        return json_to_dfc_card(card)
+    else:
+        return json_to_simple_card(card)
+
+
+def dict_to_list_of_cards(to_convert: dict) -> List[Union[Card, DFCCard]]:
+    results: List[Union[Card, DFCCard]] = []
     for card in to_convert["data"]:
         results.append(json_to_card(card))
     return results
@@ -167,7 +256,7 @@ def dict_to_list_of_cards(to_convert: dict) -> List[Card]:
 
 @dataclass()
 class Results:
-    results: List[Card]
+    results: List[Union[Card, DFCCard]]
 
     def length(self) -> int:
         return len(self.results)
@@ -182,9 +271,7 @@ class Results:
 
         return radiolist_dialog(title="Results", values=values, style=style)
 
-    def show_card(self, index: int):
-        value: int = self.results[index].widget().run()
-        if value == 2:
-            open_on_browser(self.results[index].url)
-        elif value == 3:
-            self.results[index].download_card()
+    def show_card(self, index: int) -> None:
+        card = self.results[index]
+        card.show()
+

@@ -28,16 +28,16 @@ class Scheme:
         return "<ansired>Scheme</ansired>"
 
     def lore_str(self) -> str:
-        if self.lore:
+        if not self.lore == "":
             return f"\n<ansiblue>{self.lore}</ansiblue>\n— — — — —"
 
-        return ""
+        return " "
 
     def abandon_str(self) -> str:
-        if self.abandon:
+        if not self.abandon == "":
             return f"\n<ansired>{self.abandon}</ansired>\n— — — — —"
 
-        return ""
+        return " "
 
     def widget_text(self) -> str:
         """

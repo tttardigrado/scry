@@ -1,6 +1,7 @@
-from scry.api_processing.results import Card, json_to_card
+from scry.api_processing.results import Card, DFCCard, json_to_card
 from scry.api_processing.constants import ScryfallError
 from scry.functions.general import setup_query
+from typing import Union
 import requests
 
 
@@ -66,7 +67,7 @@ def show_random(query: str = "") -> None:
     card_json: dict = random_card(query)
 
     # convert the card json to a card object
-    card: Card = json_to_card(card_json)
+    card: Union[Card, DFCCard] = json_to_card(card_json)
 
     # show the card
     card.show()
